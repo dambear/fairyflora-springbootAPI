@@ -1,8 +1,9 @@
 package com.danbear.fairyflora.employee;
 
-import org.springframework.data.repository.ListCrudRepository;
 
-public interface EmployeeRepository extends ListCrudRepository <Employee, Integer> {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 
 }
