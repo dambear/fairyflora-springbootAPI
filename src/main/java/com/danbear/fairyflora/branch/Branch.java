@@ -46,11 +46,7 @@ public class Branch {
   private LocalDate dateEstablished;
 
   @OneToMany(mappedBy = "branch",cascade = CascadeType.ALL)
-  @JsonIgnoreProperties({"employees"}) // This lets the branch include its employees in JSON
+  @JsonManagedReference // This lets the branch include its employees in JSON
   private List<Employee> employees;
-
-  @OneToOne(mappedBy = "branch", cascade = CascadeType.ALL)
-  @JsonIgnoreProperties("branch") // Prevent circular reference
-  private Inventory inventory;
 
 }
