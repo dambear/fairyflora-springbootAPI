@@ -49,4 +49,8 @@ public class Branch {
   @JsonManagedReference // This lets the branch include its employees in JSON
   private List<Employee> employees;
 
+  @OneToOne(mappedBy = "branch", cascade = CascadeType.ALL)
+  @JsonIgnoreProperties("branch") // Prevent circular reference
+  private Inventory inventory;
+
 }
