@@ -1,6 +1,7 @@
 package com.danbear.fairyflora.inventory;
 
 import com.danbear.fairyflora.branch.Branch;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -27,7 +28,8 @@ public class Inventory {
   private Long zonrox;
 
   @OneToOne
-  @JoinColumn( referencedColumnName = "id") // Use a foreign key
+  @JoinColumn( referencedColumnName = "id")
+  @JsonIgnoreProperties({"inventory","employees"}) // Use a foreign key
   private Branch branch;
 
 }
