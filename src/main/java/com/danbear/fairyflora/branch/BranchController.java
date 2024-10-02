@@ -1,7 +1,6 @@
 package com.danbear.fairyflora.branch;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,10 +38,12 @@ public class BranchController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Void> updateBranch(@PathVariable Long id, @RequestBody Branch newBranch) {
+  public ResponseEntity<Optional<Branch>> updateBranch(@PathVariable Long id, @RequestBody Branch newBranch) {
     try {
+      // Update the branch and return the updated entity
       branchService.updateBranch(newBranch, id);
-      return ResponseEntity.ok().build();
+      Optional<Branch> updatedBranch = branchService.findBranchById(id); // Retrieve the updated branch
+      return ResponseEntity.ok(updatedBranch);
     } catch (EntityNotFoundException e) {
       return ResponseEntity.notFound().build();
     }
