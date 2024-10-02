@@ -40,11 +40,10 @@ public class Employee {
     @NotNull @Column(unique = true)
     private String emailAddress;
 
-    @NotNull
-    private Long branchId; // Foreign key
+
 
     @ManyToOne
-    @JoinColumn(name = "branchId", insertable = false, updatable = false)
+    @JoinColumn(name = "branch_id")
     @JsonIgnoreProperties({"employees"}) // >>> @JsonBackReference // This tells Jackson to ignore this branch in the JSON output
     private Branch branch; // Reference to Branch entity
 

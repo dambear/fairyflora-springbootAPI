@@ -1,6 +1,7 @@
 package com.danbear.fairyflora.branch;
 
 import com.danbear.fairyflora.employee.Employee;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -44,7 +45,7 @@ public class Branch {
   private LocalDate dateEstablished;
 
   @OneToMany(mappedBy = "branch",cascade = CascadeType.ALL)
-  @JsonManagedReference // This lets the branch include its employees in JSON
+  @JsonIgnoreProperties({"employees"}) // This lets the branch include its employees in JSON
   private List<Employee> employees;
 
 }
