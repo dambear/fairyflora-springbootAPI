@@ -1,5 +1,7 @@
 package com.danbear.fairyflora.employee;
 
+import com.danbear.fairyflora.branch.Branch;
+import com.danbear.fairyflora.branch.BranchService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -11,9 +13,11 @@ import java.util.Optional;
 public class EmployeeService {
 
   private final EmployeeRepository employeeRepository;
+  private final BranchService branchService;
 
-  EmployeeService(EmployeeRepository employeeRepository) {
+  EmployeeService(EmployeeRepository employeeRepository, BranchService branchService) {
     this.employeeRepository = employeeRepository;
+    this.branchService = branchService;
   }
 
   public List<Employee> findAllEmployees() {
@@ -43,6 +47,18 @@ public class EmployeeService {
       existingEmployee.setDateHired(newEmployee.getDateHired());
       existingEmployee.setRole(newEmployee.getRole());
       existingEmployee.setEmailAddress(newEmployee.getEmailAddress());
+
+      // Update the branch if a new branch ID is provided
+      if (newEmployee.getBranch() != null && newEmployee.getBranch().getId() != null) {
+        Long branchId = newEmployee.getBranch().getId();
+        Optional<Branch> newBranchOpt = branchService.findBranchById(branchId); // Assuming branchRepository is available
+
+        if (newBranchOpt.isPresent()) {
+          existingEmployee.setBranch(newBranchOpt.get());
+        } else {
+          throw new EntityNotFoundException("Branch not found with id: " + branchId);
+        }
+      }
 
       // Save the updated entity
       employeeRepository.save(existingEmployee);
