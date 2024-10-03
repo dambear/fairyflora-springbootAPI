@@ -71,6 +71,22 @@ public class ServiceListService {
     return serviceListRepository.save(serviceList);
   }
 
+  public ServiceList removeServiceFromServiceList(Long serviceListId, Long serviceId) {
+    ServiceList serviceList = serviceListRepository.findById(serviceListId)
+        .orElseThrow(() -> new RuntimeException("ServiceList not found"));
+
+    ServiceT service = serviceService.findServiceById(serviceId)
+        .orElseThrow(() -> new RuntimeException("Service not found"));
+
+    // Remove the service from the service list
+    if (!serviceList.getServices().remove(service)) {
+      throw new RuntimeException("Service not found in the ServiceList");
+    }
+
+    return serviceListRepository.save(serviceList);
+  }
+
+
 
 
 }
