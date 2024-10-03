@@ -2,6 +2,7 @@ package com.danbear.fairyflora.branch;
 
 import com.danbear.fairyflora.employee.Employee;
 import com.danbear.fairyflora.inventory.Inventory;
+import com.danbear.fairyflora.transaction.Transaction;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -48,6 +49,7 @@ public class Branch {
   @OneToMany(mappedBy = "branch",cascade = CascadeType.ALL)
   @JsonIgnoreProperties({"employees"}) // This lets the branch include its employees in JSON
   private List<Employee> employees;
+
 
   @OneToOne(mappedBy = "branch", cascade = CascadeType.ALL)
   @JsonIgnoreProperties("branch") // Prevent circular reference
