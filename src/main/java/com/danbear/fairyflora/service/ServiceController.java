@@ -2,6 +2,7 @@ package com.danbear.fairyflora.service;
 
 import com.danbear.fairyflora.addon.Addon;
 import com.danbear.fairyflora.addon.AddonService;
+import com.danbear.fairyflora.service.item.Item;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,5 +60,15 @@ public class ServiceController {
     } catch (EntityNotFoundException e) {
       return ResponseEntity.notFound().build();
     }
+  }
+
+
+  @PutMapping("/{serviceId}/items/{itemId}")
+  public ResponseEntity<ServiceT> assignItemToService(
+      @PathVariable Long serviceId,
+      @PathVariable Long itemId
+  ) {
+    ServiceT updatedService = serviceService.assignItemToService(serviceId, itemId);
+    return ResponseEntity.ok(updatedService);
   }
 }
