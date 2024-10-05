@@ -1,8 +1,8 @@
 package com.danbear.fairyflora.transaction;
 
 import com.danbear.fairyflora.addon.Addon;
-import com.danbear.fairyflora.addon.AddonService;
-import com.danbear.fairyflora.service.ServiceService;
+import com.danbear.fairyflora.addon.AddonRepository;
+import com.danbear.fairyflora.service.ServiceRepository;
 import com.danbear.fairyflora.service.ServiceT;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -10,18 +10,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TransactionService {
 
   private final TransactionRepository transactionRepository;
-  private final AddonService addonService;
-  private final ServiceService serviceService;
+  private final AddonRepository addonRepository;
+  private final ServiceRepository serviceRepository;
 
-  TransactionService(TransactionRepository transactionRepository, AddonService addonService, ServiceService serviceService) {
+  TransactionService(TransactionRepository transactionRepository,
+                     AddonRepository addonRepository,
+                     ServiceRepository serviceRepository) {
     this.transactionRepository = transactionRepository;
-    this.addonService = addonService;
-    this.serviceService = serviceService;
+    this.addonRepository = addonRepository;
+    this.serviceRepository = serviceRepository;
   }
 
   public List<Transaction> findAllTransactions() {
@@ -33,7 +36,7 @@ public class TransactionService {
   }
 
   public Transaction createTransaction(Transaction transaction) {
-    List<Addon> allAddons = addonService.findAllAddons();
+    List<Addon> allAddons = addonRepository.findAll();
 
     transaction.setAddons(allAddons);
 
@@ -63,65 +66,21 @@ public class TransactionService {
   }
 
 
+  public Transaction assignServiceToTransaction(Long transaction_id, Long service_id) {
+    Set<ServiceT> serviceSet;
 
-  public Transaction addServiceToTransaction(Long transactionId, Long serviceId) {
-    Transaction transaction = transactionRepository.findById(transactionId)
-        .orElseThrow(() -> new RuntimeException("Transaction not found"));
+    Transaction transaction =  transactionRepository.findById(transaction_id).get();
+    ServiceT service = serviceRepository.findById(service_id).get();
 
-    ServiceT service = serviceService.findServiceById(serviceId)
-        .orElseThrow(() -> new RuntimeException("Service not found"));
+    serviceSet = transaction.getLaundryServices();
+    serviceSet.add(service);
 
-    // Add the service to the service list
-    transaction.getLaundryServices().add(service);
+    transaction.setLaundryServices(serviceSet);
+
 
     return transactionRepository.save(transaction);
+
   }
-
-  public Transaction removeServiceFromTransaction(Long transactionId, Long serviceId) {
-    Transaction transaction = transactionRepository.findById(transactionId)
-        .orElseThrow(() -> new RuntimeException("Transaction not found"));
-
-    ServiceT service = serviceService.findServiceById(serviceId)
-        .orElseThrow(() -> new RuntimeException("Service not found"));
-
-    // Remove the service from the service list
-    if (!transaction.getLaundryServices().remove(service)) {
-      throw new RuntimeException("Service not found in the ServiceList");
-    }
-
-    return transactionRepository.save(transaction);
-  }
-
-
-  public Transaction addAddonToTransaction(Long transactionId, Long addonId) {
-    Transaction transaction = transactionRepository.findById(transactionId)
-        .orElseThrow(() -> new RuntimeException("Transaction not found"));
-
-    Addon addon = addonService.findAddonById(addonId)
-        .orElseThrow(() -> new RuntimeException("Addon not found"));
-
-    // Add the service to the service list
-    transaction.getAddons().add(addon);
-
-    return transactionRepository.save(transaction);
-  }
-
-  public Transaction removeAddonFromTransaction(Long transactionId, Long addonId) {
-    Transaction transaction = transactionRepository.findById(transactionId)
-        .orElseThrow(() -> new RuntimeException("Transaction not found"));
-
-    Addon addon = addonService.findAddonById(addonId)
-        .orElseThrow(() -> new RuntimeException("Addon not found"));
-
-    // Remove the service from the service list
-    if (!transaction.getAddons().remove(addon)) {
-      throw new RuntimeException("Addon not found in the ServiceList");
-    }
-
-    return transactionRepository.save(transaction);
-  }
-
-
 
 
 
