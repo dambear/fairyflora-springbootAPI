@@ -24,7 +24,4 @@ public class Item {
   private Long price;
 
 
-  @ManyToMany(mappedBy = "items")
-  private Set<ServiceT> services = new HashSet<>();
-
 }

@@ -26,7 +26,7 @@ public class ServiceT {
   private Long totalPrice = 0L;
   private String description;
 
-  @ManyToMany
+  @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(
       name = "service_item",
       joinColumns = @JoinColumn(name = "service_id"),
@@ -34,13 +34,13 @@ public class ServiceT {
   )
   private Set<Item> items = new HashSet<>();
 
-//
-//  public void calculateTotalPrice() {
-//    long total = assignedItems.stream()
-//        .mapToLong(Item::getPrice) // Use getPrice() directly since it's Long
-//        .sum();
-//
-//    this.totalPrice = total; // Assign the total as Long
-//  }
+
+  public void calculateTotalPrice() {
+    long total = items.stream()
+        .mapToLong(Item::getPrice) // Use getPrice() directly since it's Long
+        .sum();
+
+    this.totalPrice = total; // Assign the total as Long
+  }
 
 }

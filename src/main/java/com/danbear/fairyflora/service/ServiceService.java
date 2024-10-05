@@ -45,7 +45,7 @@ import java.util.Set;
         existingService.setDescription(newService.getDescription());
 
         // Recalculate the total price based on assigned services
-//        existingService.calculateTotalPrice();
+        existingService.calculateTotalPrice();
 
         // Save the updated entity
         serviceRepository.save(existingService);
@@ -62,12 +62,16 @@ import java.util.Set;
 
     public ServiceT assignItemToService(Long service_id, Long item_id) {
       Set<Item> itemSet;
+
       ServiceT service =  serviceRepository.findById(service_id).get();
       Item item = itemRepository.findById(item_id).get();
+
       itemSet = service.getItems();
       itemSet.add(item);
 
       service.setItems(itemSet);
+      service.calculateTotalPrice();
+
       return serviceRepository.save(service);
     }
 
@@ -90,15 +94,17 @@ import java.util.Set;
 //    return serviceRepository.save(service);
 //  }
 
-//
+
 //  public ServiceT assignItemToService(Long service_id, Long item_id) {
 //    ServiceT service = serviceRepository.findById(service_id)
 //        .orElseThrow(() -> new EntityNotFoundException("Service not found with id: " + service_id));
 //    Item item = itemRepository.findById(item_id)
 //        .orElseThrow(() -> new EntityNotFoundException("Item not found with id: " + item_id));
 //
-//    service.getAssignedItems().add(item);
-//    service.calculateTotalPrice(); // Recalculate total price
+//
+//    service.getItems().add(item);
+//
+//
 //    return serviceRepository.save(service);
 //  }
 
