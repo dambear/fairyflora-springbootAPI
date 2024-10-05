@@ -1,15 +1,20 @@
-package com.danbear.fairyflora.addon;
+package com.danbear.fairyflora.service.item;
 
+import com.danbear.fairyflora.service.ServiceT;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "addon")
-public class Addon {
+@Table(name = "item")
+public class Item {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -18,10 +23,5 @@ public class Addon {
   @NotNull
   private Long price;
 
-  @Column(nullable = false)
-  private Long quantity = 0L;  // Initialize to 0
-
-  @Column(nullable = false)
-  private Long totalPrice = 0L; // Initialize to 0
 
 }
