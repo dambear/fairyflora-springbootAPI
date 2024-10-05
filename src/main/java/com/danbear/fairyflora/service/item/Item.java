@@ -1,6 +1,7 @@
-package com.danbear.fairyflora.service.servicelist;
+package com.danbear.fairyflora.service.item;
 
 import com.danbear.fairyflora.service.ServiceT;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,8 +13,8 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "servicelist")
-public class ServiceList {
+@Table(name = "item")
+public class Item {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -22,12 +23,8 @@ public class ServiceList {
   @NotNull
   private Long price;
 
-  @ManyToMany
-  @JoinTable(
-      name = "service_list_service",
-      joinColumns = @JoinColumn(name = "service_list_id"),
-      inverseJoinColumns = @JoinColumn(name = "service_id")
-  )
+
+  @ManyToMany(mappedBy = "items")
   private Set<ServiceT> services = new HashSet<>();
 
 }
