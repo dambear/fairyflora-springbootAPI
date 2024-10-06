@@ -1,13 +1,18 @@
 package com.danbear.fairyflora.inventory;
 
+import com.danbear.fairyflora.addon.dto.AddonDto;
 import com.danbear.fairyflora.branch.Branch;
+import com.danbear.fairyflora.exception.StatusObject;
 import com.danbear.fairyflora.inventory.Inventory;
 import com.danbear.fairyflora.inventory.InventoryService;
+import com.danbear.fairyflora.inventory.dto.InventoryDto;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,43 +27,46 @@ public class InventoryController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Inventory>> getAllInventories() {
-    List<Inventory> inventories = inventoryService.findAllInventories();
+  public ResponseEntity<List<InventoryDto>> getAllInventories() {
+    List<InventoryDto> inventories = inventoryService.findAllInventories();
     return new ResponseEntity<>(inventories, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Inventory> getBranchById(@PathVariable Long id) {
-    Optional<Inventory> inventory = inventoryService.findInventoryById(id);
-    return inventory.map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+  public ResponseEntity<InventoryDto> getInventoryById(@PathVariable Long id) {
+    return ResponseEntity.ok(inventoryService.findInventoryById(id));
   }
 
   @PostMapping
-  public ResponseEntity<Inventory> createBranch(@RequestBody Inventory inventory) {
-    Inventory createdInventory = inventoryService.createInventory(inventory);
-    return new ResponseEntity<>(createdInventory, HttpStatus.CREATED);
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<InventoryDto> createAddon(@Valid @RequestBody InventoryDto inventoryDto) {
+    return new ResponseEntity<>(inventoryService.createInventory(inventoryDto), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Optional<Inventory>> updateInventory(@PathVariable Long id, @RequestBody Inventory newInventory) {
-    try {
-      // Update the branch and return the updated entity
-      inventoryService.updateInventory(newInventory, id);
-      Optional<Inventory> updatedInventory = inventoryService.findInventoryById(id); // Retrieve the updated branch
-      return ResponseEntity.ok(updatedInventory);
-    } catch (EntityNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<InventoryDto> updateInventory(
+      @Valid
+      @RequestBody InventoryDto inventoryDto,
+      @PathVariable("id") Long id)
+  {
+    InventoryDto response = inventoryService.updateInventory(inventoryDto, id);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
-    try {
-      inventoryService.deleteInventory(id);
-      return ResponseEntity.noContent().build(); // 204 No Content
-    } catch (EntityNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+  public ResponseEntity<StatusObject> deleteInventory(
+      @PathVariable("id") Long id)
+  {
+    inventoryService.deleteInventory(id);
+
+    // Display Status and code
+    StatusObject statusObject = new StatusObject();
+    statusObject.setStatusCode(HttpStatus.OK.value());
+    statusObject.setMessage("Inventory deleted with id: " + id );
+    statusObject.setTimestamp(new Date());
+
+    return new ResponseEntity<>(statusObject, HttpStatus.OK);
   }
+
 }

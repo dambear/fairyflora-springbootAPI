@@ -1,11 +1,16 @@
 package com.danbear.fairyflora.employee;
 
 
+import com.danbear.fairyflora.branch.dto.BranchDto;
+import com.danbear.fairyflora.employee.dto.EmployeeDto;
+import com.danbear.fairyflora.exception.StatusObject;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,43 +25,47 @@ public class EmployeeController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Employee>> getAllEmployees() {
-    List<Employee> employees = employeeService.findAllEmployees();
+  public ResponseEntity<List<EmployeeDto>> getAllAddons() {
+    List<EmployeeDto> employees = employeeService.findAllEmployees();
     return new ResponseEntity<>(employees, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-    Optional<Employee> employee = employeeService.findEmployeeById(id);
-    return employee.map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+  public ResponseEntity<EmployeeDto> getAddonById(@PathVariable Long id) {
+    return ResponseEntity.ok(employeeService.findEmployeeById(id));
   }
 
   @PostMapping
-  public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-    Employee createEmployee = employeeService.createEmployee(employee);
-    return new ResponseEntity<>(createEmployee, HttpStatus.CREATED);
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<EmployeeDto> createAddon(@Valid @RequestBody EmployeeDto employeeDto) {
+    return new ResponseEntity<>(employeeService.createEmployee(employeeDto), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Optional<Employee>> updateEmployee(@PathVariable Long id, @RequestBody Employee newEmployee) {
-    try {
-      // Update the branch and return the updated entity
-      employeeService.updateEmployee(newEmployee, id);
-      Optional<Employee> updatedEmployee = employeeService.findEmployeeById(id); // Retrieve the updated branch
-      return ResponseEntity.ok(updatedEmployee);
-    } catch (EntityNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+  public ResponseEntity<EmployeeDto> updateAddon(
+      @Valid
+      @RequestBody EmployeeDto employeeDto,
+      @PathVariable("id") Long id)
+  {
+    EmployeeDto response = employeeService.updateEmployee(employeeDto, id);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
+
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-    try {
-      employeeService.deleteEmployee(id);
-      return ResponseEntity.noContent().build(); // 204 No Content
-    } catch (EntityNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+  public ResponseEntity<StatusObject> deleteAddon(
+      @PathVariable("id") Long id)
+  {
+    employeeService.deleteEmployee(id);
+
+    // Display Status and code
+    StatusObject statusObject = new StatusObject();
+    statusObject.setStatusCode(HttpStatus.OK.value());
+    statusObject.setMessage("Employee deleted with id: " + id );
+    statusObject.setTimestamp(new Date());
+
+    return new ResponseEntity<>(statusObject, HttpStatus.OK);
   }
+
+
 }

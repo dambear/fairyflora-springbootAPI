@@ -2,12 +2,17 @@ package com.danbear.fairyflora.service;
 
 import com.danbear.fairyflora.addon.Addon;
 import com.danbear.fairyflora.addon.AddonService;
+import com.danbear.fairyflora.addon.dto.AddonDto;
+import com.danbear.fairyflora.exception.StatusObject;
+import com.danbear.fairyflora.service.dto.ServiceTDto;
 import com.danbear.fairyflora.service.item.Item;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,53 +27,56 @@ public class ServiceController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ServiceT>> getAllServices() {
-    List<ServiceT> services = serviceService.findAllServices();
+  public ResponseEntity<List<ServiceTDto>> getAllServices() {
+    List<ServiceTDto> services = serviceService.findAllServices();
     return new ResponseEntity<>(services, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ServiceT> getServiceById(@PathVariable Long id) {
-    Optional<ServiceT> addon = serviceService.findServiceById(id);
-    return addon.map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+  public ResponseEntity<ServiceTDto> getAddonById(@PathVariable Long id) {
+    return ResponseEntity.ok(serviceService.findServiceById(id));
   }
 
   @PostMapping
-  public ResponseEntity<ServiceT> createService(@RequestBody ServiceT service) {
-    ServiceT createdAddon = serviceService.createService(service);
-    return new ResponseEntity<>(createdAddon, HttpStatus.CREATED);
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<ServiceTDto> createAddon(@Valid @RequestBody ServiceTDto serviceTDto) {
+    return new ResponseEntity<>(serviceService.createService(serviceTDto), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Optional<ServiceT>> updateService(@PathVariable Long id, @RequestBody ServiceT newService) {
-    try {
-      // Update the branch and return the updated entity
-      serviceService.updateService(newService, id);
-      Optional<ServiceT> updatedService = serviceService.findServiceById(id); // Retrieve the updated branch
-      return ResponseEntity.ok(updatedService);
-    } catch (EntityNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<ServiceTDto> updateAddon(
+      @Valid
+      @RequestBody ServiceTDto serviceTDto,
+      @PathVariable("id") Long id)
+  {
+    ServiceTDto response = serviceService.updateService(serviceTDto, id);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteService(@PathVariable Long id) {
-    try {
-      serviceService.deleteService(id);
-      return ResponseEntity.noContent().build(); // 204 No Content
-    } catch (EntityNotFoundException e) {
-      return ResponseEntity.notFound().build();
-    }
+  public ResponseEntity<StatusObject> deleteAddon(
+      @PathVariable("id") Long id)
+  {
+    serviceService.deleteService(id);
+
+    // Display Status and code
+    StatusObject statusObject = new StatusObject();
+    statusObject.setStatusCode(HttpStatus.OK.value());
+    statusObject.setMessage("Service deleted with id: " + id );
+    statusObject.setTimestamp(new Date());
+
+    return new ResponseEntity<>(statusObject, HttpStatus.OK);
   }
 
-
   @PutMapping("/{serviceId}/items/{itemId}")
-  public ResponseEntity<ServiceT> assignItemToService(
+  public ResponseEntity<ServiceTDto> assignItemToService(
       @PathVariable Long serviceId,
       @PathVariable Long itemId
   ) {
-    ServiceT updatedService = serviceService.assignItemToService(serviceId, itemId);
+    ServiceTDto updatedService = serviceService.assignItemToService(serviceId, itemId);
     return ResponseEntity.ok(updatedService);
   }
+
+
 }
