@@ -4,13 +4,17 @@ import com.danbear.fairyflora.branch.Branch;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-@Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
 @Table(name = "inventory")
 public class Inventory {
 
@@ -18,13 +22,10 @@ public class Inventory {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull
   private Long ariel;
 
-  @NotNull
   private Long downy;
 
-  @NotNull
   private Long zonrox;
 
   @OneToOne

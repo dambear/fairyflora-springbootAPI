@@ -1,52 +1,51 @@
-package com.danbear.fairyflora.branch;
+package com.danbear.fairyflora.branch.dto;
 
 import com.danbear.fairyflora.employee.Employee;
 import com.danbear.fairyflora.inventory.Inventory;
-import com.danbear.fairyflora.transaction.Transaction;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "branch")
-
-public class Branch {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BranchDto {
   private Long id;
 
+  @NotEmpty
   private String barangay;
 
+  @NotEmpty
   private String municipality;
 
+  @NotEmpty
   private String province;
 
+  @NotNull
   private LocalTime openingTime;
 
+  @NotNull
   private LocalTime closingTime;
 
+  @NotEmpty @Column(unique = true)
   private String emailAddress;
 
+  @NotNull
   private LocalDate dateEstablished;
 
-  @OneToMany(mappedBy = "branch",cascade = CascadeType.ALL)
+  @JsonIgnoreProperties({"employees", "branch"})
   private List<Employee> employees;
 
-  @OneToOne(mappedBy = "branch", cascade = CascadeType.ALL)
+  @JsonIgnoreProperties("branch")
   private Inventory inventory;
 
 }
