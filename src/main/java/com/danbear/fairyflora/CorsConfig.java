@@ -13,7 +13,7 @@ public class CorsConfig {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Apply CORS settings to all endpoints
-            .allowedOrigins("http://localhost:3000") // Allow requests from your frontend origin
+            .allowedOrigins("http://localhost:3000", "https://fairyflora-ijmaaximv-denverasi01-gmailcoms-projects.vercel.app") // Allow requests from your frontend origin
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
             .allowedHeaders("*") // Allow all headers
             .allowCredentials(true) // Allow credentials (cookies, authorization headers, etc.)
